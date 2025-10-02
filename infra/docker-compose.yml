@@ -33,40 +33,68 @@ services:
     ports:
       - "5432:5432"
 
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+
   api:
     build:
       context: ../api
     volumes:
-      - ../storage:/app/storage
+      - ../api:/app
     ports:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/pixelforge
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
-      - UPLOAD_DIR=/app/storage/upload
-      - CONVERTED_DIR=/app/storage/converted
+      - STORAGE_ENDPOINT=http://minio:9000
+      - STORAGE_ACCESS_KEY=minioadmin
+      - STORAGE_SECRET_KEY=minioadmin
+      - STORAGE_REGION=us-east-1
     depends_on:
       db:
         condition: service_healthy
       rabbitmq:
+        condition: service_healthy
+      minio:
         condition: service_healthy
 
   img-worker:
     build:
       context: ../img-worker
     volumes:
-      - ../storage:/app/storage
+      - ../img-worker:/app
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/pixelforge
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
-      - UPLOAD_DIR=/app/storage/upload
-      - CONVERTED_DIR=/app/storage/converted
+      - STORAGE_ENDPOINT=http://minio:9000
+      - STORAGE_ACCESS_KEY=minioadmin
+      - STORAGE_SECRET_KEY=minioadmin
+      - STORAGE_REGION=us-east-1
     depends_on:
       db:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      minio:
+        condition: service_healthy
 
 volumes:
   pixelforge_data:
+  minio_data:
 
