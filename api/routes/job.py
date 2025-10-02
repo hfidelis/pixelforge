@@ -1,14 +1,14 @@
 import os
 import uuid
-import aiofiles
 
 from celery import Celery
-from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from core.db import get_db
 from core.settings import get_settings
+from core.storage import storage_client
 
 from models.base import (
     Job,
@@ -41,18 +41,21 @@ async def create_job(
 
     celery_client = Celery(broker=settings.celery_broker_url.unicode_string())
 
-    ext = os.path.splitext(schema.file.filename)[1].lstrip(".").lower()
+    ext = schema.file.filename.split(".")[-1].lower()
     filename = f"{uuid.uuid4().hex}.{ext}"
-    input_path = os.path.join(settings.upload_dir, filename)
 
     contents = await schema.file.read()
 
-    async with aiofiles.open(input_path, "wb") as out_file:
-        await out_file.write(contents)
+    storage_client.put_object(
+        Bucket=settings.storage_upload_bucket,
+        Key=filename,
+        Body=contents,
+        ContentType=schema.file.content_type,
+    )
 
     job = Job(
         filename=schema.file.filename,
-        input_path="/upload/" + filename,
+        input_path=filename,
         original_format=ext,
         target_format=schema.target_format,
         status=JobStatus.PENDING,
@@ -94,7 +97,7 @@ async def get_status(
 async def download(
     job_id: int,
     db: AsyncSession = Depends(get_db),
-) -> FileResponse:
+) -> StreamingResponse:
     job = await db.get(Job, job_id)
 
     if not job:
@@ -109,16 +112,16 @@ async def download(
             detail="Output file not ready",
         )
 
-    file_path = os.path.join(settings.converted_dir, os.path.basename(job.output_path))
+    obj = storage_client.get_object(
+        Bucket=settings.storage_converted_bucket,
+        Key=job.output_path,
+    )
 
-    if not os.path.exists(file_path):
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="File not found on disk",
-        )
-
-    return FileResponse(
-        path=file_path,
-        filename=os.path.basename(file_path)
+    return StreamingResponse(
+        obj['Body'],
+        media_type="application/octet-stream",
+        headers={
+            "Content-Disposition": f"attachment; filename={job.filename}"
+        }
     )
 

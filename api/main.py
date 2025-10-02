@@ -7,14 +7,12 @@ from core.db import (
     engine,
     Base,
 )
+from core.storage import create_bucket_if_not_exists
 from routes.job import router as job_router
 
 from core.settings import get_settings
 
 settings = get_settings()
-
-os.makedirs(settings.upload_dir, exist_ok=True)
-os.makedirs(settings.converted_dir, exist_ok=True)
 
 
 @asynccontextmanager
@@ -22,8 +20,16 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
+    create_bucket_if_not_exists(settings.storage_upload_bucket)
+    create_bucket_if_not_exists(settings.storage_converted_bucket)
 
-app = FastAPI(title=settings.app_name)
+    yield
+
+
+app = FastAPI(
+    title=settings.app_name,
+    lifespan=lifespan,
+)
 
 app.add_middleware(
     CORSMiddleware,
