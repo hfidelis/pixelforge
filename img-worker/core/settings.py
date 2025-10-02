@@ -9,20 +9,39 @@ load_dotenv()
 
 
 class Settings(BaseSettings):
+    storage_endpoint: str = os.getenv(
+        "STORAGE_ENDPOINT",
+        "minio:9000"
+    )
+
+    storage_access_key: str = os.getenv(
+        "STORAGE_ACCESS_KEY",
+        "minioadmin"
+    )
+
+    storage_secret_key: str = os.getenv(
+        "STORAGE_SECRET_KEY",
+        "minioadmin"
+    )
+
+    storage_region: str = os.getenv(
+        "STORAGE_REGION",
+        "us-east-1"
+    )
+
+    storage_upload_bucket: str = os.getenv(
+        "STORAGE_UPLOAD_BUCKET",
+        "uploads"
+    )
+
+    storage_converted_bucket: str = os.getenv(
+        "STORAGE_CONVERTED_BUCKET",
+        "converted"
+    )
 
     app_name: str = os.getenv(
         "APP_NAME",
         "pixelforge-img-worker"
-    )
-
-    upload_dir: str = os.getenv(
-        "UPLOAD_DIR",
-        "/app/storage/upload",
-    )
-
-    converted_dir: str = os.getenv(
-        "CONVERTED_DIR",
-        "/app/storage/converted",
     )
 
     broker_url: AmqpDsn = os.getenv(

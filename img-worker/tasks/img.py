@@ -1,10 +1,12 @@
-import os
+import uuid
+from io import BytesIO
 from datetime import datetime, timezone
 from PIL import Image
 from main import celery
 from core.db import SessionLocal
 from models import Job, JobStatus
 from core.settings import get_settings
+from core.storage import storage_client
 
 settings = get_settings()
 
@@ -12,11 +14,8 @@ settings = get_settings()
 @celery.task(name="convert_image", bind=True, acks_late=True)
 def convert_image(self, job_id: int):
     session = SessionLocal()
-
     try:
-        print(f"Starting image conversion for job_id={job_id}")
         job = session.get(Job, job_id)
-
         if not job:
             self.update_state(state="FAILURE", meta={"reason": "job-not-found"})
             return
@@ -25,47 +24,40 @@ def convert_image(self, job_id: int):
         job.started_at = datetime.now(timezone.utc)
         session.commit()
 
-        rel_input = job.input_path.lstrip("/")
-        if rel_input.startswith("upload/"):
-            rel_input = rel_input[len("upload/"):]
+        response = storage_client.get_object(Bucket="uploads", Key=job.input_path)
+        input_bytes = response['Body'].read()
 
-        input_path = os.path.join(settings.upload_dir, rel_input)
+        img = Image.open(BytesIO(input_bytes))
+        target_ext = job.target_format
+        out_buffer = BytesIO()
 
-        if not os.path.exists(input_path):
-            raise FileNotFoundError(f"input file not found: {input_path}")
+        if target_ext in ("jpg", "jpeg") and img.mode in ("RGBA", "LA", "P"):
+            img = img.convert("RGB")
 
-        base = os.path.splitext(os.path.basename(input_path))[0]
-        target_ext = job.target_format.lstrip(".").lower()
-        out_filename = f"{base}.{target_ext}"
+        img.save(out_buffer, format=target_ext.upper())
+        out_buffer.seek(0)
 
-        abs_output_path = os.path.join(settings.converted_dir, out_filename)
-        os.makedirs(os.path.dirname(abs_output_path), exist_ok=True)
+        out_filename = f"{uuid.uuid4().hex}.{target_ext}"
+        storage_client.put_object(
+            Bucket=settings.storage_converted_bucket,
+            Key=out_filename,
+            Body=out_buffer,
+            ContentType=f"image/{target_ext}"
+        )
 
-        with Image.open(input_path) as img:
-            if target_ext in ("jpg", "jpeg") and img.mode in ("RGBA", "LA", "P"):
-                img = img.convert("RGB")
-
-            img.save(abs_output_path, format=target_ext.upper())
-
-        rel_output_path = f"/converted/{out_filename}"
-
-        job.output_path = rel_output_path
+        job.output_path = out_filename
         job.status = JobStatus.SUCCESS
         job.finished_at = datetime.now(timezone.utc)
+
         session.commit()
 
-        return {"output_path": abs_output_path}
+        return {"output_path": out_filename}
 
     except Exception as exc:
         session.rollback()
-        try:
-            job = session.get(Job, job_id)
-            if job:
-                job.status = JobStatus.FAILED
-                job.finished_at = datetime.now(timezone.utc)
-                session.commit()
-        except Exception:
-            pass
-        raise exc
+        job.status = JobStatus.FAILED
+        job.finished_at = datetime.now(timezone.utc)
+        session.commit()
+        raise
     finally:
         session.close()
