@@ -2,7 +2,7 @@ from typing import Optional
 from datetime import datetime
 from fastapi import UploadFile
 from pydantic import BaseModel
-from models.base import JobStatus
+from models.job import JobStatus
 
 
 class JobCreate(BaseModel):
@@ -17,6 +17,7 @@ class JobRead(BaseModel):
     output_path: Optional[str]
     original_format: str
     target_format: str
+    user_id: int
     status: JobStatus
     created_at: datetime
 
@@ -27,6 +28,7 @@ class JobRead(BaseModel):
 class JobStatusRead(BaseModel):
     id: int
     status: JobStatus
+    user_id: int
     created_at: datetime
     started_at: Optional[datetime]
     finished_at: Optional[datetime]

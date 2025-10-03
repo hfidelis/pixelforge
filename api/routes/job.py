@@ -1,4 +1,3 @@
-import os
 import uuid
 
 from celery import Celery
@@ -9,8 +8,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from core.db import get_db
 from core.settings import get_settings
 from core.storage import storage_client
+from core.dependencies import get_current_user
 
-from models.base import (
+from models.job import (
     Job,
     JobStatus,
 )
@@ -22,7 +22,7 @@ from schemas.job import (
 
 settings = get_settings()
 
-router = APIRouter()
+router = APIRouter(tags=["jobs"])
 
 
 @router.post(
@@ -32,7 +32,14 @@ router = APIRouter()
 async def create_job(
     schema: JobCreate = Depends(),
     db: AsyncSession = Depends(get_db),
+    user=Depends(get_current_user),
 ) -> JobRead:
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required"
+        )
+
     if not schema.target_format:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -57,6 +64,7 @@ async def create_job(
         filename=schema.file.filename,
         input_path=filename,
         original_format=ext,
+        user_id=user.id,
         target_format=schema.target_format,
         status=JobStatus.PENDING,
     )
@@ -80,11 +88,18 @@ async def create_job(
 )
 async def get_status(
     job_id: int,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    user=Depends(get_current_user),
 ) -> JobStatusRead:
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required"
+        )
+
     job = await db.get(Job, job_id)
 
-    if not job:
+    if not job or job.user_id != user.id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Job not found",
@@ -97,10 +112,17 @@ async def get_status(
 async def download(
     job_id: int,
     db: AsyncSession = Depends(get_db),
+    user=Depends(get_current_user),
 ) -> StreamingResponse:
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required"
+        )
+
     job = await db.get(Job, job_id)
 
-    if not job:
+    if not job or job.user_id != user.id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Job not found",
@@ -117,11 +139,13 @@ async def download(
         Key=job.output_path,
     )
 
+    filename = f"{job.filename.split('.')[0]}.{job.target_format}"
+
     return StreamingResponse(
         obj['Body'],
         media_type="application/octet-stream",
         headers={
-            "Content-Disposition": f"attachment; filename={job.filename}"
+            "Content-Disposition": f"attachment; filename={filename}"
         }
     )
 

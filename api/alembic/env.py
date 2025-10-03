@@ -1,4 +1,5 @@
-import models
+import models.user
+import models.job
 import asyncio
 from logging.config import fileConfig
 

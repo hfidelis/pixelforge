@@ -9,6 +9,10 @@ load_dotenv()
 
 
 class Settings(BaseSettings):
+    secret_key: str = os.getenv("SECRET_KEY")
+    auth_algorithm: str = os.getenv("AUTH_ALGORITHM", "HS256")
+    access_token_ttl_minutes: int = int(os.getenv("ACCESS_TOKEN_TTL_MINUTES", 30))
+
     storage_endpoint: str = os.getenv(
         "STORAGE_ENDPOINT",
         "minio:9000"
