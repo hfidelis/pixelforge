@@ -19,3 +19,4 @@ def create_bucket_if_not_exists(bucket_name: str):
 
     if not any(bucket['Name'] == bucket_name for bucket in existing_buckets.get('Buckets', [])):
         storage_client.create_bucket(Bucket=bucket_name)
+

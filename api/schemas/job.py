@@ -33,3 +33,4 @@ class JobStatusRead(BaseModel):
 
     class Config:
         from_attributes = True
+

@@ -61,3 +61,4 @@ def convert_image(self, job_id: int):
         raise
     finally:
         session.close()
+
