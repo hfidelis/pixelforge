@@ -1,29 +1,68 @@
 import uuid
 
 from celery import Celery
+from sqlalchemy import select
+from datetime import timedelta
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 
 from core.db import get_db
+from utils.pagination import paginate
 from core.settings import get_settings
 from core.storage import storage_client
-from core.dependencies import get_current_user
+from utils.dependencies import get_current_user
 
 from models.job import (
     Job,
     JobStatus,
 )
+
 from schemas.job import (
     JobCreate,
     JobRead,
     JobStatusRead,
+    PresignedRedirectResponse,
+)
+
+from schemas.pagination import (
+    PaginationParams,
+    PaginatedResponse,
 )
 
 settings = get_settings()
 
 router = APIRouter(tags=["jobs"])
 
+@router.get(
+    "/",
+    response_model=PaginatedResponse[JobRead],
+)
+async def list_jobs(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    user=Depends(get_current_user),
+    pagination: PaginationParams = Depends(),
+) -> PaginatedResponse[JobRead]:
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required"
+        )
+
+    query = select(Job).where(Job.user_id == user.id).order_by(Job.id.desc())
+
+    result = await paginate(
+        db=db,
+        model=Job,
+        base_query=query,
+        page=pagination.page,
+        size=pagination.size,
+        request=request,
+    )
+
+
+    return result
 
 @router.post(
     "/convert",
