@@ -17,7 +17,7 @@ from core.security import (
 settings = get_settings()
 
 router = APIRouter(tags=["auth"])
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/signin/form")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/signin/form")
 
 
 @router.post("/register", response_model=UserRead)
@@ -33,11 +33,6 @@ async def register(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User with this email is already registered"
         )
-
-    print("password type:", type(user.password))
-    print("password repr:", repr(user.password))
-    print("password bytes length:", len(user.password.encode("utf-8")))
-
 
     new_user = User(
         username=user.username,
@@ -96,7 +91,6 @@ async def signin_form(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
-    print("form_data", form_data)
     if not (user := await authenticate_user(db, form_data.username, form_data.password)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
