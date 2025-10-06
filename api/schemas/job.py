@@ -36,3 +36,8 @@ class JobStatusRead(BaseModel):
     class Config:
         from_attributes = True
 
+
+class PresignedRedirectResponse(BaseModel):
+    url: str
+    filename: str
+
