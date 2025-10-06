@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from core.db import get_db
-from core.dependencies import get_current_user
+from utils.dependencies import get_current_user
 
 from schemas.user import UserRead
 
