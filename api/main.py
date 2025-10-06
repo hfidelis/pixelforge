@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -31,7 +31,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.app_name,
     lifespan=lifespan,
-    swagger_ui_oauth2_redirect_url="/auth/signin/form",
+    swagger_ui_oauth2_redirect_url="/docs/oauth2-redirect",
 )
 
 app.add_middleware(
@@ -49,20 +49,24 @@ app.add_middleware(
     ]
 )
 
-app.include_router(
+app_router = APIRouter(prefix="/api/v1")
+
+app_router.include_router(
     prefix="/auth",
     tags=["auth"],
     router=auth_router,
 )
 
-app.include_router(
+app_router.include_router(
     prefix="/users",
     tags=["users"],
     router=user_router,
 )
 
-app.include_router(
+app_router.include_router(
     prefix="/jobs",
     tags=["jobs"],
     router=job_router,
 )
+
+app.include_router(app_router)
