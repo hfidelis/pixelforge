@@ -173,18 +173,19 @@ async def download(
             detail="Output file not ready",
         )
 
-    obj = storage_client.get_object(
-        Bucket=settings.storage_converted_bucket,
-        Key=job.output_path,
+    storage_signed_url = storage_client.generate_presigned_url(
+        ClientMethod="get_object",
+        Params={
+            "Bucket": settings.storage_converted_bucket,
+            "Key": job.output_path,
+        },
+        ExpiresIn=timedelta(minutes=15).total_seconds(),
     )
 
     filename = f"{job.filename.split('.')[0]}.{job.target_format}"
 
-    return StreamingResponse(
-        obj['Body'],
-        media_type="application/octet-stream",
-        headers={
-            "Content-Disposition": f"attachment; filename={filename}"
-        }
+    return PresignedRedirectResponse(
+        url=storage_signed_url,
+        filename=filename,
     )
 
