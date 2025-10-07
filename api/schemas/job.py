@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 class JobImageExtension(str, Enum):
     PNG = "png"
+    JPG = "jpg"
     JPEG = "jpeg"
     BMP = "bmp"
     GIF = "gif"
