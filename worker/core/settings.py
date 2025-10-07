@@ -41,7 +41,7 @@ class Settings(BaseSettings):
 
     app_name: str = os.getenv(
         "APP_NAME",
-        "pixelforge-img-worker"
+        "pixelforge-worker"
     )
 
     broker_url: AmqpDsn = os.getenv(

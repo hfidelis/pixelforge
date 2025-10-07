@@ -1,5 +1,5 @@
 [project]
-name = "pixelforge-img-worker"
+name = "pixelforge-worker"
 version = "0.1.0"
 description = ""
 authors = [

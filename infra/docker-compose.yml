@@ -76,11 +76,11 @@ services:
       minio:
         condition: service_healthy
 
-  img-worker:
+  worker:
     build:
-      context: ../img-worker
+      context: ../worker
     volumes:
-      - ../img-worker:/app
+      - ../worker:/app
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/pixelforge
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
