@@ -1,13 +1,40 @@
+from enum import Enum
+from fastapi import Form
 from typing import Optional
 from datetime import datetime
 from fastapi import UploadFile
 from pydantic import BaseModel
-from models.job import JobStatus
+
+
+class JobImageExtension(str, Enum):
+    PNG = "png"
+    JPEG = "jpeg"
+    BMP = "bmp"
+    GIF = "gif"
+    TIFF = "tiff"
+    WEBP = "webp"
+
+
+    @classmethod
+    def has_value(cls, value: str) -> bool:
+        return value.lower() in (fmt.value for fmt in cls)
+
+
+    @classmethod
+    def list_values(cls) -> list[str]:
+        return [fmt.value for fmt in cls]
+
+
+class JobStatus(str, Enum):
+    PENDING = "PENDING"
+    PROCESSING = "PROCESSING"
+    SUCCESS = "SUCCESS"
+    FAILED = "FAILED"
 
 
 class JobCreate(BaseModel):
     file: UploadFile
-    target_format: str
+    target_format: JobImageExtension = Form(...)
 
 
 class JobRead(BaseModel):
@@ -15,8 +42,8 @@ class JobRead(BaseModel):
     filename: str
     input_path: str
     output_path: Optional[str]
-    original_format: str
-    target_format: str
+    original_format: JobImageExtension
+    target_format: JobImageExtension
     user_id: int
     status: JobStatus
     created_at: datetime

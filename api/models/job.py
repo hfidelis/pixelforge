@@ -1,15 +1,8 @@
-import enum
-
 from core.db import Base
 from sqlalchemy.sql import func
+from schemas.job import JobStatus
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String, Enum, DateTime, ForeignKey
-
-class JobStatus(str, enum.Enum):
-    PENDING = "PENDING"
-    PROCESSING = "PROCESSING"
-    SUCCESS = "SUCCESS"
-    FAILED = "FAILED"
 
 
 class Job(Base):

@@ -22,6 +22,7 @@ from schemas.job import (
     JobCreate,
     JobRead,
     JobStatusRead,
+    JobImageExtension,
     PresignedRedirectResponse,
 )
 
@@ -85,10 +86,16 @@ async def create_job(
             detail="target_format required"
         )
 
-    celery_client = Celery(broker=settings.celery_broker_url.unicode_string())
-
     ext = schema.file.filename.split(".")[-1].lower()
+
+    if not JobImageExtension.has_value(ext):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unsupported input file format, supported formats: {', '.join(JobImageExtension.list_values())}"
+        )
+
     filename = f"{uuid.uuid4().hex}.{ext}"
+    celery_client = Celery(broker=settings.celery_broker_url.unicode_string())
 
     contents = await schema.file.read()
 
@@ -104,7 +111,7 @@ async def create_job(
         input_path=filename,
         original_format=ext,
         user_id=user.id,
-        target_format=schema.target_format,
+        target_format=schema.target_format.value,
         status=JobStatus.PENDING,
     )
 
