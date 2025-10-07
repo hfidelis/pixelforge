@@ -44,6 +44,7 @@ async def list_jobs(
     db: AsyncSession = Depends(get_db),
     user=Depends(get_current_user),
     pagination: PaginationParams = Depends(),
+    status: JobStatus | None = None,
 ) -> PaginatedResponse[JobRead]:
     if not user:
         raise HTTPException(
@@ -52,6 +53,9 @@ async def list_jobs(
         )
 
     query = select(Job).where(Job.user_id == user.id).order_by(Job.id.desc())
+
+    if status:
+        query = query.where(Job.status == status)
 
     result = await paginate(
         db=db,
@@ -92,6 +96,12 @@ async def create_job(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unsupported input file format, supported formats: {', '.join(JobImageExtension.list_values())}"
+        )
+
+    if schema.target_format.value == ext:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="target_format must be different from the input file format"
         )
 
     filename = f"{uuid.uuid4().hex}.{ext}"
