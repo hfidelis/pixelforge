@@ -33,7 +33,7 @@ from schemas.pagination import (
 
 settings = get_settings()
 
-router = APIRouter(tags=["jobs"])
+router = APIRouter(tags=["job"])
 
 @router.get(
     "/",
@@ -74,7 +74,7 @@ async def list_jobs(
     response_model=JobRead,
 )
 async def create_job(
-    schema: JobCreate = Depends(),
+    schema: JobCreate = Depends(JobCreate.as_form),
     db: AsyncSession = Depends(get_db),
     user=Depends(get_current_user),
 ) -> JobRead:

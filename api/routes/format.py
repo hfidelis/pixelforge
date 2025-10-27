@@ -1,27 +1,26 @@
-from sqlalchemy.orm import Session
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
-
-from core.db import get_db
 from utils.dependencies import get_current_user
 
-from schemas.user import UserRead
+from schemas.job import (
+    JobImageExtension,
+)
 
-router = APIRouter(tags=["user"])
+router = APIRouter(tags=["format"])
 
 
 @router.get(
-    "/me",
-    response_model=UserRead,
+    "/image",
+    response_model=List[JobImageExtension],
 )
-async def get_own_profile(
-    db: Session = Depends(get_db),
+async def get_image_formats(
     user=Depends(get_current_user),
-) -> UserRead:
+) -> List[JobImageExtension]:
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication required"
         )
 
-    return user
+    return JobImageExtension.list_values()
 

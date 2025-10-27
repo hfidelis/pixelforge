@@ -1,5 +1,6 @@
 from enum import Enum
-from fastapi import Form
+from fastapi import Form, File
+from typing import Type
 from typing import Optional
 from datetime import datetime
 from fastapi import UploadFile
@@ -36,6 +37,14 @@ class JobStatus(str, Enum):
 class JobCreate(BaseModel):
     file: UploadFile
     target_format: JobImageExtension = Form(...)
+
+    @classmethod
+    def as_form(
+        cls: Type["JobCreate"],
+        file: UploadFile = File(...),
+        target_format: JobImageExtension = Form(...),
+    ) -> "JobCreate":
+        return cls(file=file, target_format=target_format)
 
 
 class JobRead(BaseModel):

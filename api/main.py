@@ -8,8 +8,9 @@ from core.db import (
 )
 
 from routes.job import router as job_router
-from routes.auth import router as auth_router
 from routes.user import router as user_router
+from routes.auth import router as auth_router
+from routes.format import router as format_router
 
 from core.settings import get_settings
 from core.storage import create_bucket_if_not_exists
@@ -51,22 +52,9 @@ app.add_middleware(
 
 app_router = APIRouter(prefix="/api/v1")
 
-app_router.include_router(
-    prefix="/auth",
-    tags=["auth"],
-    router=auth_router,
-)
-
-app_router.include_router(
-    prefix="/users",
-    tags=["users"],
-    router=user_router,
-)
-
-app_router.include_router(
-    prefix="/jobs",
-    tags=["jobs"],
-    router=job_router,
-)
+app_router.include_router(prefix="/job", router=job_router)
+app_router.include_router(prefix="/auth", router=auth_router)
+app_router.include_router(prefix="/user", router=user_router)
+app_router.include_router(prefix="/format", router=format_router)
 
 app.include_router(app_router)
