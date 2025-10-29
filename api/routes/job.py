@@ -107,18 +107,22 @@ async def create_job(
     filename = f"{uuid.uuid4().hex}.{ext}"
     celery_client = Celery(broker=settings.celery_broker_url.unicode_string())
 
-    contents = await schema.file.read()
+    file = schema.file.file
+    file.seek(0, 2)
+    content_bytes_size = file.tell()
+    file.seek(0)
 
     storage_client.put_object(
         Bucket=settings.storage_upload_bucket,
         Key=filename,
-        Body=contents,
+        Body=file,
         ContentType=schema.file.content_type,
     )
 
     job = Job(
         filename=schema.file.filename,
         input_path=filename,
+        input_size_bytes=content_bytes_size,
         original_format=ext,
         user_id=user.id,
         target_format=schema.target_format.value,

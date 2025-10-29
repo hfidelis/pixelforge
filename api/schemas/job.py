@@ -54,6 +54,8 @@ class JobRead(BaseModel):
     output_path: Optional[str]
     original_format: JobImageExtension
     target_format: JobImageExtension
+    input_size_bytes: Optional[int]
+    output_size_bytes: Optional[int]
     user_id: int
     status: JobStatus
     created_at: datetime

@@ -12,6 +12,8 @@ class Job(Base):
     filename = Column(String, nullable=False)
     input_path = Column(String, nullable=False)
     output_path = Column(String, nullable=True)
+    input_size_bytes = Column(Integer, nullable=True)
+    output_size_bytes = Column(Integer, nullable=True)
     original_format = Column(String, nullable=True)
     target_format = Column(String, nullable=False)
     status = Column(Enum(JobStatus), nullable=False, default=JobStatus.PENDING, index=True)
