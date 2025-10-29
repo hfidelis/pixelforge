@@ -37,6 +37,8 @@ def convert_image(self, job_id: int):
         img.save(out_buffer, format=target_ext.upper())
         out_buffer.seek(0)
 
+        output_size_bytes = out_buffer.getbuffer().nbytes
+
         out_filename = f"{uuid.uuid4().hex}.{target_ext}"
         storage_client.put_object(
             Bucket=settings.storage_converted_bucket,
@@ -46,6 +48,7 @@ def convert_image(self, job_id: int):
         )
 
         job.output_path = out_filename
+        job.output_size_bytes = output_size_bytes
         job.status = JobStatus.SUCCESS
         job.finished_at = datetime.now(timezone.utc)
 

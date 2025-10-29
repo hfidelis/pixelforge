@@ -20,6 +20,8 @@ class Job(Base):
     input_path = Column(String, nullable=False)
     output_path = Column(String, nullable=True)
     original_format = Column(String, nullable=True)
+    input_size_bytes = Column(Integer, nullable=True)
+    output_size_bytes = Column(Integer, nullable=True)
     target_format = Column(String, nullable=False)
     status = Column(Enum(JobStatus), nullable=False, default=JobStatus.PENDING)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
