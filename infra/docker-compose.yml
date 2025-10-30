@@ -129,6 +129,7 @@ services:
       - ACCESS_TOKEN_TTL_MINUTES=30
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/pixelforge
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      - SECRET_KEY=f5PWuSMrkU8iL9bIMyNlc7mR3cUZNNnK
       - STORAGE_ENDPOINT=http://minio:9000
       - STORAGE_ACCESS_KEY=minioadmin
       - STORAGE_SECRET_KEY=minioadmin
@@ -156,7 +157,6 @@ services:
       - STORAGE_ACCESS_KEY=minioadmin
       - STORAGE_SECRET_KEY=minioadmin
       - STORAGE_REGION=us-east-1
-      - API_URL=http://api:8000/api/v1
       - REDIS_URL=redis://redis:6379/0
     depends_on:
       db:
@@ -171,13 +171,12 @@ services:
       context: ../client
       dockerfile: Dockerfile
     ports:
-      - "5173:5173"
+      - "5173:80"
     volumes:
       - ../client:/app
     environment:
       - NODE_ENV=development
       - VITE_API_BASE_URL=http://localhost:8000/api/v1/
-    command: npm run dev -- --host 0.0.0.0
     depends_on:
       - api
 

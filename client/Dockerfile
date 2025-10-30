@@ -1,19 +1,23 @@
-# =========================
-# VUE 3 + VITE DEV SERVER
-# =========================
-FROM node:20-alpine
+FROM node:20-alpine AS builder
 
-# Define o diretório de trabalho dentro do container
 WORKDIR /app
 
-# Copia apenas arquivos de dependências para aproveitar cache
 COPY package*.json ./
 
-# Instala dependências (modo dev)
-RUN npm install
+RUN npm ci
 
-# Expõe a porta padrão do Vite
-EXPOSE 5173
+COPY . .
 
-# Comando padrão para iniciar o servidor de desenvolvimento
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+RUN npm run build
+
+FROM nginx:alpine
+
+RUN rm -rf /etc/nginx/conf.d/default.conf
+
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

@@ -69,6 +69,35 @@
           "success": "Completed",
           "failed": "Error"
         }
+      },
+      "jobTable": {
+        "title": "Job History",
+        "columns": {
+          "id": "ID",
+          "filename": "File name",
+          "createdAt": "Creation date",
+          "originalFormat": "Original format",
+          "targetFormat": "Output format",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "buttons": {
+          "preview": "View",
+          "download": "To go down",
+          "refresh": "To update"
+        },
+        "messages": {
+          "loadErrorTitle": "Error loading",
+          "loadErrorMessage": "Unable to load job list.",
+          "refreshSuccessTitle": "Updated",
+          "refreshSuccessMessage": "Job list updated successfully.",
+          "previewErrorTitle": "Error viewing",
+          "previewErrorMessage": "Unable to load job image.",
+          "downloadSuccessTitle": "Download started",
+          "downloadSuccessMessage": "The file has been downloaded successfully.",
+          "downloadErrorTitle": "Error when downloading",
+          "downloadErrorMessage": "Failed to download the file."
+        }
       }
     }
   },
