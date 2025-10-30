@@ -31,6 +31,43 @@ PixelForge is a  media conversion platform built with modern technologies. It pr
 
 ## 🏗️ Architecture
 
+### mermaid version
+
+```mermaid
+sequenceDiagram
+    participant User as 👤 User (Vue)
+    participant API as 🧩 FastAPI API
+    participant DB as 🗄️ PostgreSQL
+    participant S3 as ☁️ MinIO
+    participant MQ as 🐇 RabbitMQ
+    participant Worker as ⚙️ Celery Worker
+    participant Redis as 🧠 Redis Pub/Sub
+
+    User->>API: Upload image (POST /job/convert)
+    API->>DB: Create Job record (status=PENDING)
+    API->>S3: Upload original image
+    API->>MQ: Send message (job_id)
+    API-->>User: Return Job ID
+
+    Worker->>MQ: Consume job
+    Worker->>S3: Download original image
+    Worker->>Worker: Convert image
+    Worker->>S3: Upload converted image
+    Worker->>Redis: Publish status (PROCESSING → SUCCESS)
+    Worker->>DB: Update job status in database
+
+    User->>API: Connect WebSocket
+    API->>Redis: Subscribe to Pub/Sub channel
+    Redis-->>API: Receive status update
+    API-->>User: Send real-time status via WebSocket
+
+    User->>API: Request file download
+    API->>S3: Stream converted image
+    API-->>User: Return StreamingResponse
+```
+
+### .png
+
 ![Application Architecture](./docs/diagram_en.png)
 
 The platform follows a microservices architecture with three main components:
