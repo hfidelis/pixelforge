@@ -1,0 +1,246 @@
+{
+  "components": {
+    "shared": {
+      "header": {
+        "logout": "Sair",
+        "salutation": "Olá,"
+      }
+    },
+    "jobs": {
+      "jobUploadForm": {
+        "title": {
+          "upload": "Enviar imagem",
+          "success": "Conversão iniciada com sucesso!"
+        },
+        "description": {
+          "upload": "Selecione um arquivo e o formato de destino.",
+          "supportedFormats": "Formatos suportados",
+          "waiting": "Aguardando atualização do job...",
+          "connecting": "Conectando ao servidor..."
+        },
+        "labels": {
+          "targetFormat": "Formato de destino",
+          "file": "Arquivo",
+          "id": "ID",
+          "format": "Formato",
+          "filename": "Nome do arquivo",
+          "status": "Status",
+          "inputSize": "Tamanho de entrada"
+        },
+        "buttons": {
+          "upload": "Enviar",
+          "clear": "Limpar",
+          "remove": "Remover",
+          "view": "Visualizar",
+          "download": "Baixar",
+          "new": "Converter outra mídia"
+        },
+        "messages": {
+          "error": "Erro",
+          "fileAlreadySelected": "Arquivo já selecionado",
+          "removeFirst": "Remova o arquivo atual antes de adicionar outro.",
+          "invalidFormat": "Formato inválido",
+          "formatNotAccepted": "Formato \"{ext}\" não é aceito. Formatos: {formats}",
+          "sameFormatMessage": "O arquivo enviado já está no formato de destino.",
+          "dragOrClick": "Arraste o arquivo aqui ou clique para selecionar.",
+          "invalidFields": "Campos inválidos",
+          "checkFields": "Verifique os campos obrigatórios.",
+          "uploadSent": "Upload enviado",
+          "jobCreated": "O job foi criado com sucesso.",
+          "uploadError": "Falha ao enviar o upload. Tente novamente mais tarde.",
+          "conversionComplete": "Conversão concluída!",
+          "conversionSuccess": "O job foi processado com sucesso.",
+          "conversionFailed": "Falha na conversão",
+          "conversionError": "O job falhou durante o processamento.",
+          "previewSuccess": "Visualizando imagem convertida",
+          "previewMessage": "A imagem foi carregada com sucesso.",
+          "previewErrorTitle": "Erro ao visualizar",
+          "previewErrorMessage": "Não foi possível carregar a imagem convertida.",
+          "downloadStart": "Download iniciado",
+          "downloadSuccess": "O arquivo foi baixado com sucesso.",
+          "downloadError": "Erro ao baixar",
+          "downloadErrorMessage": "Falha ao realizar o download do arquivo.",
+          "connectionError": "Erro na conexão",
+          "connectionMessage": "Houve um erro na conexão com o servidor."
+        },
+        "status": {
+          "pending": "Pendente",
+          "processing": "Processando",
+          "success": "Concluído",
+          "failed": "Erro"
+        }
+      },
+      "jobTable": {
+        "title": "Histórico de Jobs",
+        "columns": {
+          "id": "ID",
+          "filename": "Nome do arquivo",
+          "createdAt": "Data de criação",
+          "originalFormat": "Formato original",
+          "targetFormat": "Formato de saída",
+          "status": "Status",
+          "actions": "Ações"
+        },
+        "buttons": {
+          "preview": "Visualizar",
+          "download": "Baixar",
+          "refresh": "Atualizar"
+        },
+        "messages": {
+          "loadErrorTitle": "Erro ao carregar",
+          "loadErrorMessage": "Não foi possível carregar a lista de jobs.",
+          "refreshSuccessTitle": "Atualizado",
+          "refreshSuccessMessage": "Lista de jobs atualizada com sucesso.",
+          "previewErrorTitle": "Erro ao visualizar",
+          "previewErrorMessage": "Não foi possível carregar a imagem do job.",
+          "downloadSuccessTitle": "Download iniciado",
+          "downloadSuccessMessage": "O arquivo foi baixado com sucesso.",
+          "downloadErrorTitle": "Erro ao baixar",
+          "downloadErrorMessage": "Falha ao realizar o download do arquivo."
+        }
+      }
+    }
+  },
+  "views": {
+    "signIn": {
+      "title": "Acesse sua conta",
+      "mobileTitle": "PixelForge",
+      "form": {
+        "fields": {
+          "email": {
+            "label": "Email",
+            "placeholder": "Digite seu email",
+            "error": {
+              "required": "Email é obrigatório.",
+              "invalid": "Por favor, insira um email válido."
+            }
+          },
+          "password": {
+            "label": "Senha",
+            "placeholder": "Digite sua senha",
+            "error": {
+              "required": "Senha é obrigatória."
+            }
+          }
+        },
+        "submit": {
+          "label": "Entrar"
+        },
+        "success": {
+          "title": "Login bem-sucedido",
+          "message": "Você entrou na sua conta com sucesso."
+        },
+        "error": {
+          "invalid": {
+            "title": "Campo(s) inválido(s)",
+            "message": "Por favor, verifique os campos destacados e tente novamente."
+          },
+          "failed": {
+            "title": "Falha na autenticação",
+            "message": "Não foi possível entrar. Verifique suas credenciais e tente novamente."
+          }
+        }
+      },
+      "footer": {
+        "noAccount": "Não tem uma conta?",
+        "signUp": "Cadastre-se aqui"
+      },
+      "aside": {
+        "title": "PixelForge",
+        "subtitle": "Faça login para começar agora mesmo a explorar novos formatos de mídia!"
+      }
+    },
+    "signUp": {
+      "title": "Crie sua conta",
+      "form": {
+        "fields": {
+          "username": {
+            "label": "Nome de usuário",
+            "placeholder": "Escolha um nome de usuário",
+            "error": {
+              "required": "Nome de usuário é obrigatório.",
+              "minLength": "O nome de usuário deve ter no mínimo 3 caracteres.",
+              "maxLength": "O nome de usuário deve ter no máximo 20 caracteres."
+            }
+          },
+          "email": {
+            "label": "Email",
+            "placeholder": "Digite seu email",
+            "error": {
+              "required": "Email é obrigatório.",
+              "invalid": "Por favor, insira um email válido."
+            }
+          },
+          "password": {
+            "label": "Senha",
+            "placeholder": "Digite sua senha",
+            "error": {
+              "required": "Senha é obrigatória.",
+              "minLength": "A senha deve ter no mínimo 6 caracteres."
+            }
+          },
+          "confirmPassword": {
+            "label": "Confirmar senha",
+            "placeholder": "Repita sua senha",
+            "error": {
+              "required": "Confirmação de senha é obrigatória.",
+              "mismatch": "As senhas não coincidem."
+            }
+          },
+          "terms": {
+            "label": "Aceito os termos de uso",
+            "error": {
+              "required": "Você precisa aceitar os termos para continuar."
+            }
+          }
+        },
+        "submit": {
+          "label": "Cadastrar"
+        },
+        "success": {
+          "title": "Cadastro realizado",
+          "message": "Sua conta foi criada com sucesso! Faça login para continuar."
+        },
+        "error": {
+          "invalid": {
+            "title": "Campo(s) inválido(s)",
+            "message": "Por favor, verifique os campos destacados e tente novamente."
+          },
+          "failed": {
+            "title": "Falha no cadastro",
+            "message": "Não foi possível criar sua conta. Tente novamente mais tarde."
+          },
+          "exists": {
+            "title": "Conta já existente",
+            "message": "Uma conta com este email ou nome de usuário já existe."
+          }
+        }
+      },
+      "footer": {
+        "alreadyAccount": "Já possui uma conta?",
+        "signIn": "Acesse aqui"
+      },
+      "aside": {
+        "title": "PixelForge",
+        "subtitle": "Cadastre-se agora mesmo para transformar suas mídias!"
+      }
+    },
+    "home": {
+      "anonymous": "Usuário",
+      "tabs": {
+        "conversion": "Conversão",
+        "history": "Histórico"
+      },
+      "error": {
+        "formatFetch": {
+          "title": "Falha ao buscar formatos",
+          "message": "Não foi possível carregar os formatos disponíveis. Tente novamente mais tarde."
+        },
+        "jobFetch": {
+          "title": "Falha ao buscar histórico",
+          "message": "Não foi possível carregar o histórico de conversões. Tente novamente mais tarde."
+        }
+      }
+    }
+  }
+}

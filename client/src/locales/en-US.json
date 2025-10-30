@@ -1,0 +1,217 @@
+{
+  "components": {
+    "shared": {
+      "header": {
+        "logout": "Logout",
+        "salutation": "Hello,"
+      }
+    },
+    "jobs": {
+      "jobUploadForm": {
+        "title": {
+          "upload": "Send image",
+          "success": "Conversion started successfully!"
+        },
+        "description": {
+          "upload": "Select a file and destination format.",
+          "supportedFormats": "Supported formats",
+          "waiting": "Waiting for job update...",
+          "connecting": "Connecting to the server..."
+        },
+        "labels": {
+          "targetFormat": "Target format",
+          "file": "File",
+          "id": "ID",
+          "format": "Format",
+          "filename": "File name",
+          "status": "Status",
+          "inputSize": "Input size"
+        },
+        "buttons": {
+          "upload": "To send",
+          "clear": "To clean",
+          "remove": "Remove",
+          "view": "View",
+          "download": "Download",
+          "new": "Convert another media"
+        },
+        "messages": {
+          "error": "Error",
+          "fileAlreadySelected": "File already selected",
+          "removeFirst": "Remove the current file before adding another.",
+          "invalidFormat": "Invalid format",
+          "formatNotAccepted": "Format \"{ext}\" is not accepted. ",
+          "sameFormatMessage": "The uploaded file is already in the target format.",
+          "dragOrClick": "Drag the file here or click to select.",
+          "invalidFields": "Invalid fields",
+          "checkFields": "Check the required fields.",
+          "uploadSent": "Upload sent",
+          "jobCreated": "The job was created successfully.",
+          "uploadError": "Failed to send the upload. ",
+          "conversionComplete": "Conversion complete!",
+          "conversionSuccess": "The job was processed successfully.",
+          "conversionFailed": "Conversion failed",
+          "conversionError": "The job failed during processing.",
+          "previewSuccess": "Viewing converted image",
+          "previewMessage": "The image has been loaded successfully.",
+          "previewErrorTitle": "Error viewing",
+          "previewErrorMessage": "The converted image could not be loaded.",
+          "downloadStart": "Download started",
+          "downloadSuccess": "The file has been downloaded successfully.",
+          "downloadError": "Error when downloading",
+          "downloadErrorMessage": "Failed to download the file.",
+          "connectionError": "Connection error",
+          "connectionMessage": "There was an error connecting to the server."
+        },
+        "status": {
+          "pending": "Pending",
+          "processing": "Processing",
+          "success": "Completed",
+          "failed": "Error"
+        }
+      }
+    }
+  },
+  "views": {
+    "signIn": {
+      "title": "Access your account",
+      "mobileTitle": "PixelForge",
+      "form": {
+        "fields": {
+          "email": {
+            "label": "E-mail",
+            "placeholder": "Enter your email",
+            "error": {
+              "required": "Email is mandatory.",
+              "invalid": "Please enter a valid email."
+            }
+          },
+          "password": {
+            "label": "Password",
+            "placeholder": "Enter your password",
+            "error": {
+              "required": "Password is mandatory."
+            }
+          }
+        },
+        "submit": {
+          "label": "Sign In"
+        },
+        "success": {
+          "title": "Successful login",
+          "message": "You have successfully logged into your account."
+        },
+        "error": {
+          "invalid": {
+            "title": "Invalid field(s)",
+            "message": "Please check the highlighted fields and try again."
+          },
+          "failed": {
+            "title": "Authentication failed",
+            "message": "Unable to enter. Please check your credentials and try again."
+          }
+        }
+      },
+      "footer": {
+        "noAccount": "Don't have an account?",
+        "signUp": "Register here"
+      },
+      "aside": {
+        "title": "PixelForge",
+        "subtitle": "Log in to start exploring new media formats now!"
+      }
+    },
+    "signUp": {
+      "title": "Create your account",
+      "form": {
+        "fields": {
+          "username": {
+            "label": "Username",
+            "placeholder": "Choose a username",
+            "error": {
+              "required": "Username is mandatory.",
+              "minLength": "The username must be at least 3 characters long.",
+              "maxLength": "The username must be at most 20 characters long."
+            }
+          },
+          "email": {
+            "label": "E-mail",
+            "placeholder": "Enter your email",
+            "error": {
+              "required": "Email is mandatory.",
+              "invalid": "Please enter a valid email."
+            }
+          },
+          "password": {
+            "label": "Password",
+            "placeholder": "Enter your password",
+            "error": {
+              "required": "Password is mandatory.",
+              "minLength": "The password must be at least 6 characters long."
+            }
+          },
+          "confirmPassword": {
+            "label": "Confirm password",
+            "placeholder": "Repeat your password",
+            "error": {
+              "required": "Password confirmation is mandatory.",
+              "mismatch": "Passwords do not match."
+            }
+          },
+          "terms": {
+            "label": "I accept the terms of use",
+            "error": {
+              "required": "You must accept the terms to continue."
+            }
+          }
+        },
+        "submit": {
+          "label": "Register"
+        },
+        "success": {
+          "title": "Registration completed",
+          "message": "Your account has been created successfully! "
+        },
+        "error": {
+          "invalid": {
+            "title": "Invalid field(s)",
+            "message": "Please check the highlighted fields and try again."
+          },
+          "failed": {
+            "title": "Registration failure",
+            "message": "Unable to create your account. "
+          },
+          "exists": {
+            "title": "Account already exists",
+            "message": "An account with this email or username already exists."
+          }
+        }
+      },
+      "footer": {
+        "alreadyAccount": "Already have an account?",
+        "signIn": "Access here"
+      },
+      "aside": {
+        "title": "PixelForge",
+        "subtitle": "Create your account and start transforming your images right now!"
+      }
+    },
+    "home": {
+      "anonymous": "User",
+      "tabs": {
+        "conversion": "Conversion",
+        "history": "History"
+      },
+      "error": {
+        "formatFetch": {
+          "title": "Failed to load formats",
+          "message": "Unable to fetch available formats. Please try again later."
+        },
+        "jobFetch": {
+          "title": "Failed to load jobs",
+          "message": "Unable to fetch your conversion history. Please try again later."
+        }
+      }
+    }
+  }
+}
