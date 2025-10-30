@@ -1,10 +1,14 @@
 import uuid
+import json
+
 from io import BytesIO
-from datetime import datetime, timezone
 from PIL import Image
 from main import celery
-from core.db import SessionLocal
 from models import Job, JobStatus
+from datetime import datetime, timezone
+
+from core.db import SessionLocal
+from core.redis import redis_client
 from core.settings import get_settings
 from core.storage import storage_client
 
@@ -23,6 +27,16 @@ def convert_image(self, job_id: int):
         job.status = JobStatus.PROCESSING
         job.started_at = datetime.now(timezone.utc)
         session.commit()
+
+        redis_client.publish(
+            "jobs_channel",
+            json.dumps({
+                "job_id": job.id,
+                "message": {
+                    "status": "PROCESSING"
+                }
+            })
+        )
 
         response = storage_client.get_object(Bucket="uploads", Key=job.input_path)
         input_bytes = response['Body'].read()
@@ -54,6 +68,17 @@ def convert_image(self, job_id: int):
 
         session.commit()
 
+        redis_client.publish(
+            "jobs_channel",
+            json.dumps({
+                "job_id": job.id,
+                "message": {
+                    "status": "SUCCESS",
+                    "output_path": out_filename
+                }
+            })
+        )
+
         return {"output_path": out_filename}
 
     except Exception as exc:
@@ -61,6 +86,16 @@ def convert_image(self, job_id: int):
         job.status = JobStatus.FAILED
         job.finished_at = datetime.now(timezone.utc)
         session.commit()
+        redis_client.publish(
+            "jobs_channel",
+            json.dumps({
+                "job_id": job.id,
+                "message": {
+                    "status": "FAILED",
+                    "reason": str(exc)
+                }
+            })
+        )
         raise
     finally:
         session.close()

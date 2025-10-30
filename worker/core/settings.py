@@ -49,9 +49,19 @@ class Settings(BaseSettings):
         "amqp://guest:guest@rabbitmq:5672//",
     )
 
+    redis_url: str = os.getenv(
+        "REDIS_URL",
+        "redis://redis:6379/0",
+    )
+
     database_url: PostgresDsn = os.getenv(
         "DATABASE_URL",
         "postgresql://postgres:postgres@db/pixelforge",
+    )
+
+    api_url: str = os.getenv(
+        "API_URL",
+        "http://api:8000/api/v1",
     )
 
     class Config:
