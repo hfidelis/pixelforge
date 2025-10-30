@@ -1,8 +1,9 @@
+from typing import Generator
 import uuid
 
 from celery import Celery
 from sqlalchemy import select
-from datetime import timedelta
+from botocore.exceptions import ClientError
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, HTTPException, status, Request
@@ -21,9 +22,7 @@ from models.job import (
 from schemas.job import (
     JobCreate,
     JobRead,
-    JobStatusRead,
     JobImageExtension,
-    PresignedRedirectResponse,
 )
 
 from schemas.pagination import (
@@ -144,13 +143,13 @@ async def create_job(
 
 @router.get(
     "/status/{job_id}",
-    response_model=JobStatusRead,
+    response_model=JobRead,
 )
 async def get_status(
     job_id: int,
     db: AsyncSession = Depends(get_db),
     user=Depends(get_current_user),
-) -> JobStatusRead:
+) -> JobRead:
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -167,46 +166,68 @@ async def get_status(
 
     return job
 
+def stream_from_minio(bucket: str, key: str) -> Generator[bytes, None, None]:
+    obj = storage_client.get_object(Bucket=bucket, Key=key)
+    for chunk in obj["Body"].iter_chunks(chunk_size=8192):
+        yield chunk
+
+
+async def get_job_or_404(db: AsyncSession, job_id: int, user_id: int) -> Job:
+    job = await db.get(Job, job_id)
+    if not job or job.user_id != user_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+    if not job.output_path:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Output file not ready")
+    return job
+
+
 
 @router.get("/download/{job_id}")
-async def download(
+async def download_job(
     job_id: int,
     db: AsyncSession = Depends(get_db),
     user=Depends(get_current_user),
 ) -> StreamingResponse:
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication required"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
 
-    job = await db.get(Job, job_id)
+    job = await get_job_or_404(db, job_id, user.id)
 
-    if not job or job.user_id != user.id:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Job not found",
-        )
-
-    if not job.output_path:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Output file not ready",
-        )
-
-    storage_signed_url = storage_client.generate_presigned_url(
-        ClientMethod="get_object",
-        Params={
-            "Bucket": settings.storage_converted_bucket,
-            "Key": job.output_path,
-        },
-        ExpiresIn=timedelta(minutes=15).total_seconds(),
-    )
+    try:
+        file_stream = stream_from_minio(settings.storage_converted_bucket, job.output_path)
+    except ClientError as e:
+        raise HTTPException(status_code=500, detail=f"Storage error: {e}")
 
     filename = f"{job.filename.split('.')[0]}.{job.target_format}"
+    media_type = f"image/{job.target_format}"
 
-    return PresignedRedirectResponse(
-        url=storage_signed_url,
-        filename=filename,
+    return StreamingResponse(
+        file_stream,
+        media_type=media_type,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
+@router.get("/preview/{job_id}")
+async def preview_job(
+    job_id: int,
+    db: AsyncSession = Depends(get_db),
+    user=Depends(get_current_user),
+) -> StreamingResponse:
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
+
+    job = await get_job_or_404(db, job_id, user.id)
+
+    try:
+        file_stream = stream_from_minio(settings.storage_converted_bucket, job.output_path)
+    except ClientError as e:
+        raise HTTPException(status_code=500, detail=f"Storage error: {e}")
+
+    filename = f"{job.filename.split('.')[0]}.{job.target_format}"
+    media_type = f"image/{job.target_format}"
+
+    return StreamingResponse(
+        file_stream,
+        media_type=media_type,
+        headers={"Content-Disposition": f'inline; filename="{filename}"'},
+    )

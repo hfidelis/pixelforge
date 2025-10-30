@@ -15,7 +15,12 @@ class Settings(BaseSettings):
 
     storage_endpoint: str = os.getenv(
         "STORAGE_ENDPOINT",
-        "minio:9000"
+        "http://minio:9000"
+    )
+
+    storage_public_endpoint: str = os.getenv(
+        "STORAGE_PUBLIC_ENDPOINT",
+        "http://localhost:8080/files"
     )
 
     storage_access_key: str = os.getenv(
@@ -46,6 +51,11 @@ class Settings(BaseSettings):
     app_name: str = os.getenv(
         "APP_NAME",
         "PixelForge API"
+    )
+
+    redis_url: str = os.getenv(
+        "REDIS_URL",
+        "redis://redis:6379"
     )
 
     celery_broker_url: AmqpDsn = os.getenv(

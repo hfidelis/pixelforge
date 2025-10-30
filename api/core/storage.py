@@ -14,6 +14,14 @@ storage_client = boto3.client(
     config=Config(signature_version="s3v4"),
 )
 
+public_storage_client = boto3.client(
+    "s3",
+    endpoint_url=settings.storage_public_endpoint,
+    aws_access_key_id=settings.storage_access_key,
+    aws_secret_access_key=settings.storage_secret_key,
+    region_name=settings.storage_region,
+    config=Config(signature_version="s3v4"),
+)
 
 def create_bucket_if_not_exists(bucket_name: str):
     existing_buckets = storage_client.list_buckets()

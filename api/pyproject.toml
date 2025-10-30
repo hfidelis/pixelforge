@@ -21,7 +21,11 @@ dependencies = [
     "boto3 (>=1.40.44,<2.0.0)",
     "python-jose (>=3.5.0,<4.0.0)",
     "passlib[bcrypt] (>=1.7.4,<2.0.0)",
-    "bcrypt (==4.3.0)"
+    "bcrypt (==4.3.0)",
+    "websockets (>=15.0.1,<16.0.0)",
+    "httptools (>=0.7.1,<0.8.0)",
+    "redis (>=7.0.1,<8.0.0)",
+    "prometheus-fastapi-instrumentator (>=7.1.0,<8.0.0)",
 ]
 
 

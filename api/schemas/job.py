@@ -63,20 +63,3 @@ class JobRead(BaseModel):
     class Config:
         from_attributes = True
 
-
-class JobStatusRead(BaseModel):
-    id: int
-    status: JobStatus
-    user_id: int
-    created_at: datetime
-    started_at: Optional[datetime]
-    finished_at: Optional[datetime]
-
-    class Config:
-        from_attributes = True
-
-
-class PresignedRedirectResponse(BaseModel):
-    url: str
-    filename: str
-
